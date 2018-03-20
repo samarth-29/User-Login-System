@@ -1,9 +1,16 @@
 var express = require('express');
 var router = express.Router();
 
+let User = require('../models/user');
+
 // Home Page
 router.get('/', (req, res, next) => {
   res.render('index');
+});
+
+// Login Form
+router.get('/login', (req, res, next) => {
+  res.render('login');
 });
 
 // Register Form
@@ -33,8 +40,18 @@ router.post('/register', (req, res, next) => {
       errors: errors
     });
   } else {
-    console.log('SUCCESS');
-    return;
+    const newUser = new User({
+      name: name,
+      username: username,
+      email: email,
+      password: password
+    });
+
+    User.registerUser(newUser, (err, user) => {
+      if(err) throw err;
+      req.flash('success_msg', 'You are registered and can log in');
+      res.redirect('/login');
+    });
   }
 });
 
